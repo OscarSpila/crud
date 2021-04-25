@@ -5,6 +5,9 @@ import shortid from 'shortid'
 function App() {
   const [task, setTask] = useState("") // useS + TAB
   const [tasks, setTasks] = useState([])
+  const [editMode, setEditMode] = useState(false)
+  const [id, setId] = useState("")
+
 
   const addTask = (e) => {
     e.preventDefault()
@@ -31,6 +34,30 @@ function App() {
     setTasks(filteredTask)
   }
 
+  const editTask = (taskToEdit) => {
+    setTask(taskToEdit.name)
+    setEditMode(true)
+    setId(taskToEdit.id)
+  }
+
+  const saveTask = (e) => {
+    e.preventDefault()
+
+    if (isEmpty(task))  {
+      console.log("Task empty")
+      return
+    }
+
+
+    const editedTasks = tasks.map(item => item.id === id ? { id, name: task} : item)
+    setTasks(editedTasks)
+
+    setEditMode(false)
+    setId("")
+    setTask("")
+
+  }
+
   return (
   <div className="container mt-5">
     <h1>Tareas</h1>
@@ -55,6 +82,7 @@ function App() {
                       </button>
                       <button 
                         className="btn btn-warning btn-sm float-right"
+                        onClick={() => editTask(task)}
                         >
                           Editar
                       </button>
@@ -66,8 +94,10 @@ function App() {
         }  
       </div>
       <div className="col-4">
-        <h4 className="text-center">Formulario</h4>
-        <form onSubmit={addTask}>
+        <h4 className="text-center">
+          { editMode ? "Modificar Tarea" : "Agregar Tarea"}
+        </h4>
+        <form onSubmit={ editMode ? saveTask : addTask}>
           <input 
             type="text" 
             className="form-control mb-2" 
@@ -76,8 +106,10 @@ function App() {
             value={task}
           >
           </input>
-          <button className="btn btn-dark btn-block" type="submit">
-            Agregar
+          <button 
+            className={ editMode ? "btn btn-warning btn-block" : "btn btn-dark btn-block" }
+            type="submit">
+            {editMode ? "Guardar" : "Agregar"}
           </button>
         </form>
       </div>
